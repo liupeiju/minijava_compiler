@@ -37,7 +37,11 @@ public class MClass extends MType {
 	public boolean checkMethod(MMethod nmethod){
 		if (methodMap.containsKey(nmethod.getName())){
 			MMethod find_method = methodMap.get(nmethod.getName());
-			if (find_method.getTypeName() != nmethod.getTypeName()) //override要求类型完全相同
+			//if (find_method.getTypeName() != nmethod.getTypeName())
+			String name1 = find_method.getTypeName()
+			String name2 = nmethod.getTypeName()
+			if (!MClassList.getInstance().checkTypeMatch(name1, name2))
+			// override要求参数列表完全相同,返回类型兼容. overload要求参数列表不同.否则报错.
 				return false;
 			ArrayList<MVar> find_list = find_method.getParams();
 			ArrayList<MVar> nlist = nmethod.getParams();
