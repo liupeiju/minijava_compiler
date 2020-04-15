@@ -35,15 +35,15 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
          return types;
       }
       else
-         return null;
+         return new MTypeList();
     }
 
     public MType visit(NodeOptional n, MType argu) {
     // (ExpressionList)?
       if ( n.present() )
-         return n.node.accept(this,argu);
+        return n.node.accept(this,argu);
       else
-         return null;
+        return new MTypeList();
     }
 
     public MType visit(NodeSequence n, MType argu) {
@@ -188,8 +188,10 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
     // 检查type 是否定义
       MType _ret = null;
       MType type = n.f0.accept(this, argu);
-      if (MClassList.getInstance().getClassByName(type.getTypeName()) == null){
-        MErrorPrinter.getInstance().addError(type.getTypeName(), type.getLine(), type.getCol(), "type undefined");
+      String typename = type.getTypeName() == null ? type.getName() : type.getTypeName();
+
+      if (MClassList.getInstance().getClassByName(typename) == null){
+        MErrorPrinter.getInstance().addError(typename, type.getLine(), type.getCol(), "type undefined");
         return null;
       }
       n.f1.accept(this, argu);
@@ -217,6 +219,7 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
       n.f0.accept(this, argu);
       // Type()要返回一个MType
       MType type = n.f1.accept(this, argu);
+      String typename = type.getTypeName() == null ? type.getName() : type.getTypeName();
       n.f2.accept(this, argu);
       MClass nclass = (MClass)argu;
       MMethod nmethod = nclass.getMethodByName(n.f2.f0.tokenImage);
@@ -234,7 +237,7 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
       MType exp = n.f10.accept(this, nmethod);
       if (exp == null) return null;
       // 返回和类型匹配
-      if (!MClassList.getInstance().checkTypeMatch(type.getTypeName(), exp.getTypeName())){
+      if (!MClassList.getInstance().checkTypeMatch(typename, exp.getTypeName())){
         MErrorPrinter.getInstance().addError(exp.getName(), exp.getLine(), exp.getCol(), "return type unmatched");
         return null;
       }
@@ -261,8 +264,9 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
     // 检查type未定义
       MType _ret=null;
       MType type = n.f0.accept(this, argu);
-      if (MClassList.getInstance().getClassByName(type.getTypeName()) == null){
-        MErrorPrinter.getInstance().addError(type.getTypeName(), type.getLine(), type.getCol(), "type undefined");
+      String typename = type.getTypeName() == null ? type.getName() : type.getTypeName();
+      if (MClassList.getInstance().getClassByName(typename) == null){
+        MErrorPrinter.getInstance().addError(typename, type.getLine(), type.getCol(), "type undefined");
         return null;
       }
       n.f1.accept(this, argu);
@@ -732,12 +736,12 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
       }
       n.f3.accept(this, argu);
       MTypeList types = (MTypeList)n.f4.accept(this, nmethod);
-      if (types != null){
-        if (!call_method.checkListTypeMatch(types.getList())){
-          MErrorPrinter.getInstance().addError(n.f3.tokenImage, n.f3.beginLine, n.f3.beginColumn, "argument unmatched");
-          return null;
-        }
+      //if (types != null){ // here can be a bug
+      if (!call_method.checkListTypeMatch(types.getList())){
+        MErrorPrinter.getInstance().addError(n.f3.tokenImage, n.f3.beginLine, n.f3.beginColumn, "argument unmatched");
+        return null;
       }
+      //}
       n.f5.accept(this, argu);
       MType exp = new MType(null, call_method.getTypeName(), n.f1.beginLine, n.f1.beginColumn);
       return exp;
@@ -762,8 +766,7 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
       }
       types.addType(exp);
       MTypeList typelist = (MTypeList)n.f1.accept(this, argu);
-      if (typelist != null) 
-        types.mergeList(typelist);
+      types.mergeList(typelist);
       return types;
     }
 
@@ -802,9 +805,8 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
       MType _ret=null;
       MType exp = n.f0.accept(this, argu);
       if (exp == null) return null;
-      // Identifier类型未知, 在这里补充.
-      if (exp.getName() == exp.getTypeName()){ //来自id
-      // 检查id已定义, 增加TypeName
+      if (exp.getTypeName() == null){ //来自id
+      // 检查id已定义, 补写typeName
         MMethod nmethod = (MMethod)argu;
         MVar nvar = nmethod.getVarByName(exp.getName());
         if (nvar == null){
@@ -851,10 +853,10 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
     * f0 -> <IDENTIFIER>
     */
     public MType visit(Identifier n, MType argu) {
-    // Type()中，作为类名; Primary中,作为变量名. 此处不作区分
+    // 可作为typename，也可作为name
       MType _ret=null;
       n.f0.accept(this, argu);
-      MType type = new MType(n.f0.tokenImage, n.f0.tokenImage, n.f0.beginLine, n.f0.beginColumn);
+      MType type = new MType(n.f0.tokenImage, null, n.f0.beginLine, n.f0.beginColumn);
       return type;
     }
 

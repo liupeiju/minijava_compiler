@@ -8,9 +8,7 @@ public class MClass extends MType {
 	private HashMap<String, MMethod> methodMap = new HashMap<String, MMethod>();
 
 	public MClass(String name, int line, int col){
-		this.name = name;
-		this.line = line;
-		this.col = col;
+		super(name, null, line, col);
 	}
 
 	public boolean addVar(MVar nvar){
@@ -38,8 +36,8 @@ public class MClass extends MType {
 		if (methodMap.containsKey(nmethod.getName())){
 			MMethod find_method = methodMap.get(nmethod.getName());
 			//if (find_method.getTypeName() != nmethod.getTypeName())
-			String name1 = find_method.getTypeName()
-			String name2 = nmethod.getTypeName()
+			String name1 = find_method.getTypeName();
+			String name2 = nmethod.getTypeName();
 			if (!MClassList.getInstance().checkTypeMatch(name1, name2))
 			// override要求参数列表完全相同,返回类型兼容. overload要求参数列表不同.否则报错.
 				return false;
