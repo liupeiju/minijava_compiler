@@ -222,11 +222,11 @@ public class MyTypeCheckVisitor extends GJDepthFirst<MType, MType> {
       String typename = type.getTypeName() == null ? type.getName() : type.getTypeName();
       n.f2.accept(this, argu);
       MClass nclass = (MClass)argu;
-      MMethod nmethod = nclass.getMethodByName(n.f2.f0.tokenImage);
-      if (!nclass.checkOverload(nmethod)){
+      if (!nclass.checkOverload(n.f2.f0.tokenImage)){
         MErrorPrinter.getInstance().addError(n.f2.f0.tokenImage, n.f2.f0.beginLine, n.f2.f0.beginColumn, "method overloaded");
         return null;
       }
+      MMethod nmethod = nclass.getMethodByName(n.f2.f0.tokenImage);
       n.f3.accept(this, nmethod);
       n.f4.accept(this, nmethod);
       n.f5.accept(this, nmethod);

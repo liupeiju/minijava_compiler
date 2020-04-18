@@ -30,22 +30,21 @@ public class MClassList{
 
 	public boolean checkExtend(MClass nclass){
 		// check father defined
-		if (classMap.get(nclass.getFatherName()) == null){
+		if (getClassByName(nclass.getFatherName()) == null){
 			MErrorPrinter.getInstance().addError(nclass.getName(), nclass.getLine(), nclass.getCol(), "fatherclass undefined");
 			return false;
 		}
 		// check recursively extended
 		MClass son = nclass;
-		MClass father = classMap.get(son.getFatherName());
+		MClass father = getClassByName(son.getFatherName());
 		while (true){
 			if (father == null) break;
-			son.setFather(father);
 			if (father.getName() == nclass.getName()){
 				MErrorPrinter.getInstance().addError(nclass.getName(), nclass.getLine(), nclass.getCol(), "class extends recursively");
 				return false;
 			}
 			son = father;
-			father = classMap.get(son.getFatherName());
+			father = getClassByName(son.getFatherName());
 		}
 		return true;
 	}
@@ -55,5 +54,23 @@ public class MClassList{
 		if (nclass2.getFatherName() == null)
 			return false;
 		return checkTypeMatch(name1, nclass2.getFatherName());
+	}
+
+	// piglet
+	private static int tempNum = 20;
+	public void setOffset(){
+		for (MClass nclass : classMap.values()) {
+			tempNum	= nclass.setOffset(tempNum);
+		}
+	}
+	public int nextTemp(){
+		tempNum += 1;
+		return tempNum;
+	}
+
+	private static int label = 0;
+	public int nextLabel(){
+		label += 1;
+		return label;
 	}
 }

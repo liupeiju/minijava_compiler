@@ -10,4 +10,18 @@ public class MVar extends MType {
 		this.nclass = nclass;
 	}
 
+	// piglet
+	private int temp = 0;
+	public int getTemp(){
+		return temp;
+	}
+
+	private int offset = -1;
+	public int getOffset(){
+		return offset;
+	}
+	public void setOffset(int offset){
+		this.offset = offset;
+	}
+
 }

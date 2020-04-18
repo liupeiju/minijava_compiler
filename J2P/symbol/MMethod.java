@@ -58,4 +58,22 @@ public class MMethod extends MType {
 	public ArrayList<MVar> getParams(){
 		return paramList;
 	}
+
+	//piglet
+	private int offset = -1;
+	public int getOffset(){
+		return offset;
+	}
+	public int setOffset(int offset, int tempNum){
+		this.offset = offset;
+		
+		int num=1;
+		for (MVar param: paramMap.values()){
+			param.setOffset(num++);
+		}
+		for (MVar nvar: varMap.values()){
+			nvar.setOffset(tempNum++);
+		}
+		return tempNum;
+	}
 }
