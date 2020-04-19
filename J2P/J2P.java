@@ -7,7 +7,7 @@ public class J2P {
   	public static void main(String args[]){
 		try {
 			InputStream in = new FileInputStream(args[0]);
-			OutputStream out = new FileOutputStream(args[1]);
+			FileOutputStream out = new FileOutputStream(args[1]);
 
 			Node root = new MiniJavaParser(in).Goal();
 			root.accept(new MyBuildSymbolTableVisitor(), null);
@@ -16,7 +16,7 @@ public class J2P {
 				System.exit(1);
 			
 			MClassList.getInstance().setOffset();
-			String ans = root.accept(new MyP2JVisitor(), null).codeStr();
+			String ans = root.accept(new MyJ2PVisitor(), null).codeStr();
 			out.write(ans.getBytes());
 			out.close();
       

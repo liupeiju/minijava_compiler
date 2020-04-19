@@ -77,59 +77,58 @@ public class MClass extends MType {
 	}
 
 	// piglet
-	// 0: initial 1:complete 2:setOffset
-	private HashSet<MVar> varSet = new HashSet<>();
-	private HashSet<MMethod> methodSet = new HashSet<>();
-	public void initSet(){
-		for (MVar nvar: varMap.values())
-			varSet.add(nvar);
-		for (MMethod nmethod: methodMap.values())
-			methodSet.add(nmethod);
+	private ArrayList<MVar> varList = new ArrayList<>();
+	private ArrayList<MMethod> methodList = new ArrayList<>();
+	public ArrayList<MVar> getVarList(){
+		return varList;
 	}
-	public HashSet<MVar> getVarSet(){
-		return varSet;
-	}
-	public HashSet<MMethod> getMethodSet(){
-		return methodSet;
+	public ArrayList<MMethod> getMethodList(){
+		return methodList;
 	}
 
 	private int status = 0;
 	public int setOffset(int tempNum){
 		if (status == 1) return tempNum;
-		initSet();
-		int offset = 0;
 		MClass father = null;
 		if (fatherName != null){
 			father = MClassList.getInstance().getClassByName(fatherName);
 			tempNum = father.setOffset(tempNum);
 		}
 
+		int offset = 1;
 		if (father != null){
-			for (MVar nvar: father.getVarSet()){
-				varSet.add(nvar);
-				if (nvar.getOffset() > offset)
-					offset = nvar.getOffset();
+			for (MVar nvar: father.getVarList()){
+				varList.add(nvar);
+				offset = nvar.getOffset() + 1;
 			}
 		}
-		for (MVar nvar: this.getVarSet()){
-			offset += 4;
+		for (MVar nvar: varMap.values()){
 			nvar.setOffset(offset);
+			varList.add(nvar);
+			offset += 1;
 		}
 
 		offset = 0;
-		HashSet<Integer> methodOffset = new HashSet<>();
 		if (father != null){
-			for (MMethod nmethod: father.getMethodSet()){
-				if (!methodMap.containsKey(nmethod.getName()))
-					methodSet.add(nmethod);
-					methodOffset.add(nmethod.getOffset());
+			for (MMethod nmethod: father.getMethodList()){
+				String name = nmethod.getName();
+				int offset1 = nmethod.getOffset();
+				if (!methodMap.containsKey(name)){
+					methodList.add(nmethod);
+				} else{
+					MMethod nmethod2 = methodMap.get(name);
+					tempNum = nmethod2.setOffset(offset1, tempNum);
+					nmethod2.setPigletName();
+					methodList.add(nmethod2);
+				}
+				offset = offset1 + 1;
 			}
 		}
-		for (MMethod nmethod: this.getMethodSet()){
-			while (methodOffset.contains(offset))
-				offset += 4;
+		for (MMethod nmethod: methodMap.values()){
 			tempNum = nmethod.setOffset(offset, tempNum);
-			offset += 4;
+			nmethod.setPigletName();
+			methodList.add(nmethod);
+			offset += 1;
 		}
 		status = 1;
 		return tempNum;

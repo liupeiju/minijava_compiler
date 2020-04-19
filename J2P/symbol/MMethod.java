@@ -60,20 +60,32 @@ public class MMethod extends MType {
 	}
 
 	//piglet
-	private int offset = -1;
+	private int offset;
+	private String pigletName;
+
 	public int getOffset(){
 		return offset;
 	}
+
 	public int setOffset(int offset, int tempNum){
 		this.offset = offset;
-		
 		int num=1;
-		for (MVar param: paramMap.values()){
-			param.setOffset(num++);
+		for (MVar param: paramList){
+			param.setTempNum(num++);
 		}
 		for (MVar nvar: varMap.values()){
-			nvar.setOffset(tempNum++);
+			nvar.setTempNum(tempNum++);
 		}
 		return tempNum;
+	}
+
+	public void setPigletName(){
+		pigletName = nclass.getName()+"_"+getName();
+	}
+	public String getPigletName(){
+		return pigletName;
+	}
+	public String getPigletDefinition(){
+		return pigletName+" [ "+(paramList.size()+1)+" ]";
 	}
 }

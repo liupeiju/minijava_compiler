@@ -58,19 +58,16 @@ public class MClassList{
 
 	// piglet
 	private static int tempNum = 20;
+	private static int label = 0;
 	public void setOffset(){
 		for (MClass nclass : classMap.values()) {
 			tempNum	= nclass.setOffset(tempNum);
 		}
 	}
 	public int nextTemp(){
-		tempNum += 1;
-		return tempNum;
+		return tempNum++;
 	}
-
-	private static int label = 0;
 	public int nextLabel(){
-		label += 1;
-		return label;
+		return label++;
 	}
 }

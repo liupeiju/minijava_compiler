@@ -12,24 +12,17 @@ public class MPiglet{
 		return code.toString();
 	}
 	public void add(String str){
-		code.Append(str);
+		code.append(str);
 	}
 	public void add(MPiglet piglet){
-		code.Append(piglet.codeStr());
+		code.append(piglet.codeStr());
 	}
 
 	private MClass nclass;
-	private MMethod nmethod;
 	public MClass getNclass(){
 		return nclass;
 	}
-	public void setNclass(nclass){
+	public void setNclass(MClass nclass){
 		this.nclass = nclass;
-	}
-	public MMethod getNmethd(){
-		return nmethod;
-	}
-	public void setNclass(nmethod){
-		this.nmethod = nmethod;
 	}
 }

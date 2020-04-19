@@ -11,17 +11,18 @@ public class MVar extends MType {
 	}
 
 	// piglet
-	private int temp = 0;
-	public int getTemp(){
-		return temp;
-	}
-
-	private int offset = -1;
+	private int offset = 0;
+	private int tempNum = 0;
 	public int getOffset(){
 		return offset;
 	}
 	public void setOffset(int offset){
 		this.offset = offset;
 	}
-
+	public int getTempNum(){
+		return tempNum;
+	}
+	public void setTempNum(int tempNum){
+		this.tempNum = tempNum;
+	}
 }
