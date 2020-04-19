@@ -1,6 +1,7 @@
 javac Typecheck.java
 
-for file in `ls ./progs0`; do
+
+for file in `ls ./testcases/priv/correct`; do
 	echo $file
-	java Typecheck progs0/$file
+	java Typecheck ./testcases/priv/correct/$file
 done

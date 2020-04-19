@@ -286,12 +286,14 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MVar nvar = nmethod.getVarByName(n.f0.f0.tokenImage);
         MPiglet exp1 = n.f2.accept(this, argu);
         String t1 = nextTemp();
-        String t2 = nextTemp();
 
         if (nvar.getTempNum() == 0){//类变量
-            _ret.add("MOVE "+t1+" TIMES 4 "+(nvar.getOffset())+"\n");
-            _ret.add("MOVE "+t2+" PLUS TEMP 0 "+t1+"\n");
-            _ret.add("HSTORE "+t2+" 0 "+exp1+"\n");
+            _ret.add("MOVE "+t1+" PLUS TEMP 0 "+(4*nvar.getOffset())+"\n");
+            _ret.add("HSTORE "+t1+" 0 "+exp1+"\n");
+        }
+        else if (nvar.getTempNum() == -1){ //超过19,在数组TEMP 1中
+            _ret.add("MOVE "+t1+" PLUS TEMP 1 "+(4*nvar.getOffset())+"\n");
+            _ret.add("HSTORE "+t1+" 0 "+exp1+"\n");
         }
         else{
             _ret.add("MOVE TEMP "+nvar.getTempNum()+" "+exp1+"\n"); 
@@ -318,10 +320,13 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         String t2 = nextTemp();
 
         if (nvar.getTempNum() == 0){
-            _ret.add("MOVE "+t1+" TIMES 4 "+nvar.getOffset()+"\n");
-            _ret.add("MOVE "+t1+" PLUS TEMP 0 "+t1+"\n");
+            _ret.add("MOVE "+t1+" PLUS TEMP 0 "+(4*nvar.getOffset())+"\n");
             _ret.add("HLOAD "+t1+" "+t1+" 0\n");
         } 
+        else if (nvar.getTempNum() == -1){ //超过19,在数组TEMP 1中
+            _ret.add("MOVE "+t1+" PLUS TEMP 1 "+(4*nvar.getOffset())+"\n");
+            _ret.add("HLOAD "+t1+" "+t1+" 0\n");
+        }
         else{
             _ret.add("MOVE "+t1+" TEMP "+nvar.getTempNum()+"\n");
         }
@@ -544,22 +549,57 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MPiglet p1 = n.f0.accept(this, argu);
         MClass nclass = p1.getNclass();
         MMethod nmethod = nclass.getMethodByName(n.f2.f0.tokenImage);
-
         MPiglet exp1 = n.f4.accept(this, argu);
+        String t0 = nextTemp();
         String t1 = nextTemp();
         String t2 = nextTemp();
         String t3 = nextTemp();
+        ArrayList<String> temps = new ArrayList<>();
+
+        _ret.add("BEGIN\n");
+
+        ArrayList<String> paramList = exp1.getParams();
+        int num = paramList.size();
+        if (num > 19){
+            String t = nextTemp();
+            temps.add(t);
+            _ret.add("MOVE "+t+" HALLOCATE "+(4*num)+"\n");
+            for (int i = 0; i < num; i ++){
+                String param = paramList.get(i);
+                String t_ = nextTemp();
+                _ret.add("HSTORE "+t+" "+(4*i)+" "+param+"\n");
+            }
+
+        } else{
+            for (int i = 0; i < num; i ++){
+                String param = paramList.get(i);
+                String t_ = nextTemp();
+                temps.add(t_);
+                _ret.add("MOVE "+t_+" "+param+"\n");
+            }
+        }
+        
+        _ret.add("MOVE "+t0+" \n");
 
         _ret.add("CALL\n");
         _ret.add("BEGIN\n");
-        _ret.add("MOVE "+t1+"\n");
-        _ret.add(p1+"\n");
+        _ret.add("MOVE "+t1+" "+p1+"\n");
         _ret.add("HLOAD "+t2+" "+t1+" 0\n");
         _ret.add("HLOAD "+t3+" "+t2+" "+(4*nmethod.getOffset())+"\n");
-
         _ret.add("RETURN "+t3+"\n");
         _ret.add("END\n");
-        _ret.add("( "+t1+" "+exp1+" )\n");
+
+        if (num > 19){
+            _ret.add("( "+t1+" "+temps.get(0)+" )\n");
+        } else{
+            _ret.add("( "+t1+" ");
+            for (String t_: temps)
+                _ret.add(t_+" ");
+            _ret.add(")\n");
+        }
+
+        _ret.add("RETURN "+t0+"\n");
+        _ret.add("END\n");
 
         _ret.setNclass(nmethod.getMyClass());
         return _ret;
@@ -573,6 +613,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MPiglet _ret = new MPiglet();
         MPiglet exp1 = n.f0.accept(this, argu);
         MPiglet exp2 = n.f1.accept(this, argu);
+        _ret.init(exp1.toString());
         _ret.add(exp1);
         _ret.add(exp2);
         return _ret;
@@ -585,7 +626,8 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
     public MPiglet visit(ExpressionRest n, Object argu) {
         MPiglet _ret = new MPiglet();
         MPiglet exp1 = n.f1.accept(this, argu);
-        _ret.add(" "+exp1);
+        _ret.init(exp1.toString());
+        _ret.add(exp1);
         return _ret;
     }
 
@@ -641,14 +683,19 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MVar nvar = nmethod.getVarByName(n.f0.tokenImage);
         String t1 = nextTemp();
         String t2 = nextTemp();
-        String t3 = nextTemp();
         
         if (nvar.getTempNum() == 0){ //类变量
             _ret.add("BEGIN\n");
-            _ret.add("MOVE "+t1+" TIMES 4 "+nvar.getOffset()+"\n");
-            _ret.add("MOVE "+t2+" PLUS TEMP 0 "+t1+"\n");
-            _ret.add("HLOAD "+t3+" "+t2+" 0\n");
-            _ret.add("RETURN "+t3+"\n");
+            _ret.add("MOVE "+t1+" PLUS TEMP 0 "+(4*nvar.getOffset())+"\n");
+            _ret.add("HLOAD "+t2+" "+t1+" 0\n");
+            _ret.add("RETURN "+t2+"\n");
+            _ret.add("END\n");
+        }
+        else if (nvar.getTempNum() == -1){ //超过19,在数组TEMP 1中
+            _ret.add("BEGIN\n");
+            _ret.add("MOVE "+t1+" PLUS TEMP 1 "+(4*nvar.getOffset())+"\n");
+            _ret.add("HLOAD "+t2+" "+t1+" 0\n");
+            _ret.add("RETURN "+t2+"\n");
             _ret.add("END\n");
         }
         else

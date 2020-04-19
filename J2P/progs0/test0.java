@@ -1,37 +1,26 @@
 class test0 {
-	public static void main(String[] a){
+	public static void main(String[] cc){
 		System.out.println(new A().start());
 	}
 }
 class A {
-	boolean x;
-	B b;
-	int _ret;
 	public int start(){
-		x = false;
-		b = new B();
-		_ret = b.init();
-		if (x && (b.add()))
-			System.out.println(111);
-		else
-			System.out.println(222);
-		_ret = b.print();
-		return 0;
-	}
-}
+		int y;
+		int[] z;
 
-class B {
-	int y;
-	public int init(){
-		y = 0;
+		z = new int[5];
+		z[2] = 4;
+		y = this.morethan19(z, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
 		return y;
 	}
-	public boolean add(){
-		y = y + 1;
-		return true;
-	}
-	public int print(){
-		System.out.println(y);
-		return 0;
+	public int morethan19(int[] z,int x2,int x3,int x4,int x5,int x6,int x7,int x8,
+		int x9, int x10, int x11, int x12,int x13, int x14, int x15, int x16, int x17,
+		int x18, int x19, int x20){
+		int y;
+
+		y = (z[2]) + 5;
+		z[2] = 50 + y;
+		x16 = 5;
+		return z[2];
 	}
 }

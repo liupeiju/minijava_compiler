@@ -12,7 +12,7 @@ public class MErrorPrinter {
 	}
 	public static void addError(String name, int line, int col, String info){
 		size += 1;
-		//System.out.printf("(Line %d, Column %d) %s: %s\n", line, col, name, info);
+		System.out.printf("(Line %d, Column %d) %s: %s\n", line, col, name, info);
 	}
 
 }

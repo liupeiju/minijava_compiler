@@ -73,6 +73,14 @@ public class MMethod extends MType {
 		for (MVar param: paramList){
 			param.setTempNum(num++);
 		}
+		num=0;
+		if (paramList.size() > 19){
+			for (MVar param: paramList){
+				param.setTempNum(-1);
+				param.setOffset(num++);
+			}
+		}
+
 		for (MVar nvar: varMap.values()){
 			nvar.setTempNum(tempNum++);
 		}
