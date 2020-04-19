@@ -1,25 +1,13 @@
 class test0 {
 	public static void main(String[] a){
-		System.out.println(new Start().start());
+		System.out.println(new B().start());
 	}
 }
-class Start {
+class A {
 	public int start(){
-		B b;
-
-		System.out.println(111);
-		b = new B();
-		return B.a();
-
+		return 0;
 	}
 }
-
-class A{
-	public int a(){
-		return 3;
-	}
-}
-
 class B extends A{
 
 }

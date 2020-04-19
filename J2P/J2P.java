@@ -7,13 +7,15 @@ public class J2P {
   	public static void main(String args[]){
 		try {
 			InputStream in = new FileInputStream(args[0]);
-			FileOutputStream out = new FileOutputStream(args[1]);
+			OutputStream out = new FileOutputStream(args[1]);
 
 			Node root = new MiniJavaParser(in).Goal();
 			root.accept(new MyBuildSymbolTableVisitor(), null);
 			root.accept(new MyTypeCheckVisitor(), null);
-			if (MErrorPrinter.getInstance().getSize() != 0)
-				System.exit(1);
+			if (MErrorPrinter.getInstance().getSize() != 0){
+				System.out.println("Type error");
+				System.exit(0);
+			}
 			
 			MClassList.getInstance().setOffset();
 			String ans = root.accept(new MyJ2PVisitor(), null).codeStr();

@@ -109,6 +109,7 @@ public class MClass extends MType {
 		}
 
 		offset = 0;
+		HashSet<String> dupMethod = new HashSet<>();
 		if (father != null){
 			for (MMethod nmethod: father.getMethodList()){
 				String name = nmethod.getName();
@@ -116,6 +117,7 @@ public class MClass extends MType {
 				if (!methodMap.containsKey(name)){
 					methodList.add(nmethod);
 				} else{
+					dupMethod.add(name);
 					MMethod nmethod2 = methodMap.get(name);
 					tempNum = nmethod2.setOffset(offset1, tempNum);
 					nmethod2.setPigletName();
@@ -124,7 +126,10 @@ public class MClass extends MType {
 				offset = offset1 + 1;
 			}
 		}
+
 		for (MMethod nmethod: methodMap.values()){
+			if (dupMethod.contains(nmethod.getName()))
+				continue;
 			tempNum = nmethod.setOffset(offset, tempNum);
 			nmethod.setPigletName();
 			methodList.add(nmethod);

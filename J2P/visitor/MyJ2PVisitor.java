@@ -545,7 +545,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         _ret.add(p1.codeStr());
         _ret.add("\n");
         _ret.add("HLOAD "+t2+" "+t1+" 0\n");
-        _ret.add("HLOAD "+t3+" "+t2+" "+nmethod.getOffset()+"\n");
+        _ret.add("HLOAD "+t3+" "+t2+" "+(4*nmethod.getOffset())+"\n");
 
         _ret.add("RETURN "+t3+"\n");
         _ret.add("END\n");
@@ -701,9 +701,9 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         String t2 = nextTemp();
 
         _ret.add("BEGIN\n");
-        _ret.add("MOVE "+t1+" HALLOCATE TIMES 4 "+methodList.size()+"\n");
+        _ret.add("MOVE "+t1+" HALLOCATE  "+(4*methodList.size())+"\n");
         for (MMethod nmethod: methodList)
-            _ret.add("HSTORE "+t1+" "+nmethod.getOffset()+" "+nmethod.getPigletName()+"\n");
+            _ret.add("HSTORE "+t1+" "+(4*nmethod.getOffset())+" "+nmethod.getPigletName()+"\n");
 
         _ret.add("MOVE "+t2+" HALLOCATE PLUS 4 TIMES 4 "+varList.size()+"\n");
         _ret.add("HSTORE "+t2+" 0 "+t1+"\n");
