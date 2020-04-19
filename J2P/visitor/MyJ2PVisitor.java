@@ -187,8 +187,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         _ret.add("BEGIN\n");
         _ret.add(stmts);
         _ret.add("RETURN\n");
-        _ret.add(exp1);
-        _ret.add("\n");
+        _ret.add(exp1+"\n");
         _ret.add("END\n");
         return _ret;
     }
@@ -292,12 +291,11 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         if (nvar.getTempNum() == 0){//类变量
             _ret.add("MOVE "+t1+" TIMES 4 "+(nvar.getOffset())+"\n");
             _ret.add("MOVE "+t2+" PLUS TEMP 0 "+t1+"\n");
-            _ret.add("HSTORE "+t2+" 0 "+exp1.codeStr()+"\n");
+            _ret.add("HSTORE "+t2+" 0 "+exp1+"\n");
         }
         else{
-            _ret.add("MOVE TEMP "+nvar.getTempNum()+" "+exp1.codeStr()+"\n"); 
+            _ret.add("MOVE TEMP "+nvar.getTempNum()+" "+exp1+"\n"); 
         }
-        //_ret.setNclass(id.getNclass());
         return _ret;
     }
 
@@ -327,8 +325,8 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         else{
             _ret.add("MOVE "+t1+" TEMP "+nvar.getTempNum()+"\n");
         }
-        _ret.add("MOVE "+t2+" PLUS "+t1+" PLUS 4 TIMES 4 "+exp1.codeStr()+"\n");
-        _ret.add("HSTORE "+t2+" 0 "+exp2.codeStr()+"\n");
+        _ret.add("MOVE "+t2+" PLUS "+t1+" PLUS 4 TIMES 4 "+exp1+"\n");
+        _ret.add("HSTORE "+t2+" 0 "+exp2+"\n");
         return _ret;
     }
 
@@ -349,7 +347,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         String label1 = nextLabel();
         String label2 = nextLabel();
 
-        _ret.add("CJUMP "+exp1.codeStr()+" "+label1+"\n");
+        _ret.add("CJUMP "+exp1+" "+label1+"\n");
         _ret.add(stmt1);
         _ret.add("JUMP "+label2+"\n");
         _ret.add(label1+"\n");
@@ -373,7 +371,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         String label2 = nextLabel();
 
         _ret.add(label1+"\n");
-        _ret.add("CJUMP "+exp1.codeStr()+" "+label2+"\n");
+        _ret.add("CJUMP "+exp1+" "+label2+"\n");
         _ret.add(stmt1);
         _ret.add("JUMP "+label1+"\n");
         _ret.add(label2+" NOOP\n");
@@ -393,8 +391,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MPiglet exp1 = n.f2.accept(this, argu);
         
         _ret.add("PRINT\n");
-        _ret.add(exp1);
-        _ret.add("\n");
+        _ret.add(exp1+"\n");
         return _ret;
     }
 
@@ -423,7 +420,21 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MPiglet _ret = new MPiglet();
         MPiglet p1 = n.f0.accept(this, argu);
         MPiglet p2 = n.f2.accept(this, argu);
-        _ret.add("TIMES "+p1.codeStr()+" "+p2.codeStr()+"\n");
+        String t1 = nextTemp();
+        String t2 = nextTemp();
+        String label1 = nextLabel();
+        String label2 = nextLabel();
+
+        _ret.add("BEGIN\n");
+        _ret.add("MOVE "+t1+" "+p1+"\n");
+        _ret.add("CJUMP "+t1+" "+label1+"\n");
+        _ret.add(" MOVE "+t2+" "+p2+"\n");
+        _ret.add("JUMP "+label2+"\n");
+        _ret.add(label1+" MOVE "+t2+" 0\n");
+        _ret.add(label2+" NOOP\n");
+        _ret.add("RETURN "+t2+"\n");
+        _ret.add("END\n");
+
         return _ret;
     }
 
@@ -436,7 +447,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MPiglet _ret = new MPiglet();
         MPiglet p1 = n.f0.accept(this, argu);
         MPiglet p2 = n.f2.accept(this, argu);
-        _ret.add("LT "+p1.codeStr()+" "+p2.codeStr()+"\n");
+        _ret.add("LT "+p1+" "+p2+"\n");
         return _ret;
     }
 
@@ -449,7 +460,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MPiglet _ret = new MPiglet();
         MPiglet p1 = n.f0.accept(this, argu);
         MPiglet p2 = n.f2.accept(this, argu);
-        _ret.add("PLUS "+p1.codeStr()+" "+p2.codeStr()+"\n");
+        _ret.add("PLUS "+p1+" "+p2+"\n");
         return _ret;
     }
 
@@ -462,7 +473,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MPiglet _ret = new MPiglet();
         MPiglet p1 = n.f0.accept(this, argu);
         MPiglet p2 = n.f2.accept(this, argu);
-        _ret.add("MINUS "+p1.codeStr()+" "+p2.codeStr()+"\n");
+        _ret.add("MINUS "+p1+" "+p2+"\n");
         return _ret;
     }
 
@@ -475,7 +486,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         MPiglet _ret = new MPiglet();
         MPiglet p1 = n.f0.accept(this, argu);
         MPiglet p2 = n.f2.accept(this, argu);
-        _ret.add("TIMES "+p1.codeStr()+" "+p2.codeStr()+"\n");
+        _ret.add("TIMES "+p1+" "+p2+"\n");
         return _ret;
     }
 
@@ -494,8 +505,8 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         String t3 = nextTemp();
 
         _ret.add("BEGIN\n");
-        _ret.add("MOVE "+t1+" "+p1.codeStr()+"\n");
-        _ret.add("MOVE "+t2+" PLUS "+t1+" PLUS 4 TIMES 4 "+p2.codeStr()+"\n");
+        _ret.add("MOVE "+t1+" "+p1+"\n");
+        _ret.add("MOVE "+t2+" PLUS "+t1+" PLUS 4 TIMES 4 "+p2+"\n");
         _ret.add("HLOAD "+t3+" "+t2+" 0\n");
         _ret.add("RETURN "+t3+"\n");
         _ret.add("END\n");
@@ -513,7 +524,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         String t1 = nextTemp();
         String t2 = nextTemp();
         _ret.add("BEGIN\n");
-        _ret.add("MOVE "+t1+" "+p1.codeStr()+"\n");
+        _ret.add("MOVE "+t1+" "+p1+"\n");
         _ret.add("HLOAD "+t2+" "+t1+" 0\n");
         _ret.add("RETURN "+t2+"\n");
         _ret.add("END\n");
@@ -542,14 +553,13 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         _ret.add("CALL\n");
         _ret.add("BEGIN\n");
         _ret.add("MOVE "+t1+"\n");
-        _ret.add(p1.codeStr());
-        _ret.add("\n");
+        _ret.add(p1+"\n");
         _ret.add("HLOAD "+t2+" "+t1+" 0\n");
         _ret.add("HLOAD "+t3+" "+t2+" "+(4*nmethod.getOffset())+"\n");
 
         _ret.add("RETURN "+t3+"\n");
         _ret.add("END\n");
-        _ret.add("( "+t1+" "+exp1.codeStr()+" )\n");
+        _ret.add("( "+t1+" "+exp1+" )\n");
 
         _ret.setNclass(nmethod.getMyClass());
         return _ret;
@@ -575,8 +585,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
     public MPiglet visit(ExpressionRest n, Object argu) {
         MPiglet _ret = new MPiglet();
         MPiglet exp1 = n.f1.accept(this, argu);
-        _ret.add(" ");
-        _ret.add(exp1);
+        _ret.add(" "+exp1);
         return _ret;
     }
 
@@ -677,7 +686,7 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
         String t3 = nextTemp();
 
         _ret.add("BEGIN\n");
-        _ret.add("MOVE "+t3+" "+exp1.codeStr()+"\n");
+        _ret.add("MOVE "+t3+" "+exp1+"\n");
         _ret.add("MOVE "+t1+" PLUS 4 TIMES 4 "+t3+"\n");
         _ret.add("MOVE "+t2+" HALLOCATE "+t1+"\n");
         _ret.add("HSTORE "+t2+" 0 "+t3+"\n");
@@ -724,12 +733,8 @@ public class MyJ2PVisitor extends GJDepthFirst<MPiglet, Object> {
     public MPiglet visit(NotExpression n, Object argu) {
         MPiglet _ret = new MPiglet();
         MPiglet exp1 = n.f1.accept(this, argu);
-        String t1 = nextTemp();
 
-        _ret.add("BEGIN\n");
-        _ret.add("MOVE "+t1+" MINUS 1 "+exp1.codeStr()+"\n");
-        _ret.add("RETURN "+t1+"\n");
-        _ret.add("END\n");
+        _ret.add("MINUS 1 "+exp1+"\n");
         return _ret;
     }
 

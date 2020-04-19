@@ -18,7 +18,7 @@ public class J2P {
 			}
 			
 			MClassList.getInstance().setOffset();
-			String ans = root.accept(new MyJ2PVisitor(), null).codeStr();
+			String ans = root.accept(new MyJ2PVisitor(), null).toString();
 			out.write(ans.getBytes());
 			out.close();
       

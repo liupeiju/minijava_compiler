@@ -8,14 +8,15 @@ public class MPiglet{
 	public MPiglet(String str){
 		code = new StringBuilder(str);
 	}
-	public String codeStr(){
+	public String toString(){
 		return code.toString();
 	}
 	public void add(String str){
 		code.append(str);
 	}
+	
 	public void add(MPiglet piglet){
-		code.append(piglet.codeStr());
+		code.append(piglet.toString());
 	}
 
 	private MClass nclass;
